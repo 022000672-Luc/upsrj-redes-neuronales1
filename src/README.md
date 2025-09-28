@@ -1,4 +1,4 @@
-# **Título del Ejercicio**
+# **Redes Neuronales Artificiales**
 
 # **Índice**
 - [**Título del Ejercicio**](#título-del-ejercicio)
@@ -16,8 +16,8 @@
 
 # **Fecha de entrega**
 
-- Fecha de inicio:  00/00/00
-- Fecha de entrega: 00/00/00
+- Fecha de inicio:  29/10/25
+- **Fecha de entrega: 06/10/25**
 
 🔙 [Volver al índice](#índice)
 
@@ -27,33 +27,23 @@
 
 ## Objetivos
 
-- Objetivo
-- Objetivo
-- Objetivo
+- El alumno debe poder identificar los atributos de un perceptrón y sus entradas.
+- El alumno debe poder definir el proceso de propagación lineal en una red neuronal simple.
 
 ## Pasos
 
-1. Paso
-2. Paso
-3. Paso
+1. Define una funcion `forward_propagation_network` que implemente una red neuronal de propagación lineal, considera las clases `InputData` y `Perceptron` definidas en el paquete `perpetron`.
 
-🔙 [Volver al índice](#índice)
+    Los parámetros de la función deben ser los siguientes:
+    - inputs (int): entradas que tendrá la red
+    - perceptrons (int): número de neuronas que tendrá cada capa de la red
+    - layers (int): número de capas que tendrá la red
 
----
+    Las salidas de la función deben ser las siguientes: 
+    - network_output (float): cálculo de "a" de la capa de salida.
 
-# **Tarea**
-
-## Objetivos
-
-- Objetivo
-- Objetivo
-- Objetivo
-
-## Pasos
-
-1. Paso
-2. Paso
-3. Paso
+2. Prueba la red con un `AND` de dos entradas.
+3. Prueba la red con un `OR` de dos entradas.
 
 🔙 [Volver al índice](#índice)
 
