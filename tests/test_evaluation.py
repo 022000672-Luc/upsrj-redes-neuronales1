@@ -110,3 +110,5 @@ if __name__ == '__main__':
     else:
         print(f"{RED}{BOLD}FAILED:{RESET} Uno o más tests fallaron.")
     print(SEPARATOR)
+
+    sys.exit(not result.wasSuccessful())
