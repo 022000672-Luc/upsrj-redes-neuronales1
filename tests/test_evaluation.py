@@ -11,6 +11,7 @@ import sys, os, unittest, io
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
 import numpy as np
 from forward_propagation.forward_propagation import forward_propagation_network
+from backpropagation.backpropagation import backpropagation_network
 
 # Colores ANSI
 GREEN = "\033[92m"
@@ -80,6 +81,69 @@ class TestEvaluation(unittest.TestCase):
             salida = forward_propagation_network(inputs=entrada, perceptrons=10, layers=3)
             resultados.add(round(salida, 5))
         self.assertGreater(len(resultados), 1, f"la función puede estar hardcodeada.")
+
+    def test_backpropagation_and(self):
+        """Prueba la red neuronal con backpropagation usando la función AND"""
+        resultado = backpropagation_network(
+            inputs=self.funcion_and,
+            perceptrons=self.perceptrones,
+            layers=self.capas
+        )
+        self.assertIsInstance(resultado, float)
+        self.assertGreaterEqual(resultado, 0.0)
+        self.assertLessEqual(resultado, 1.0)
+
+    def test_backpropagation_or(self):
+        """Prueba la red neuronal con backpropagation usando la función OR"""
+        resultado = backpropagation_network(
+            inputs=self.funcion_or,
+            perceptrons=self.perceptrones,
+            layers=self.capas
+        )
+        self.assertIsInstance(resultado, float)
+        self.assertGreaterEqual(resultado, 0.0)
+        self.assertLessEqual(resultado, 1.0)
+
+    def test_backpropagation_variability(self):
+        """Verifica que backpropagation responda a cambios en la entrada"""
+        entrada_1 = np.array([0, 0])
+        entrada_2 = np.array([1, 1])
+        resultado_1 = backpropagation_network(entrada_1, 10, 5)
+        resultado_2 = backpropagation_network(entrada_2, 10, 5)
+        self.assertNotEqual(resultado_1, resultado_2, "La función no responde a cambios en la entrada.")
+
+    def test_backpropagation_randomness(self):
+        """Verifica que backpropagation no esté hardcodeada: misma entrada, múltiples ejecuciones"""
+        entrada = np.array([1.0, 0.0, 1.0, 0.0])
+        resultados = set()
+        for _ in range(5):
+            salida = backpropagation_network(inputs=entrada, perceptrons=10, layers=3)
+            resultados.add(round(salida, 5))
+        self.assertGreater(len(resultados), 1, "La función puede estar hardcodeada.")
+
+    def test_backpropagation_convergencia_basica(self):
+        """Verifica que el resultado de backpropagation se acerque al valor esperado"""
+        entrada = np.array([1, 1])  # Para función OR
+        resultado = backpropagation_network(inputs=entrada, perceptrons=10, layers=3)
+        self.assertGreater(resultado, 0.5, "La red no converge hacia el valor esperado para OR(1,1)=1")
+
+    def test_forward_vs_backpropagation_difference(self):
+        """Verifica que forward y backpropagation no generen el mismo resultado"""
+        entrada = np.array([1, 0])
+        resultado_forward = forward_propagation_network(entrada, 10, 5)
+        resultado_backprop = backpropagation_network(entrada, 10, 5)
+        self.assertNotEqual(round(resultado_forward, 5), round(resultado_backprop, 5),
+                            "Las funciones forward y backpropagation están generando el mismo resultado.")
+
+    def test_backpropagation_aprende(self):
+        """Verifica que backpropagation modifique el resultado tras múltiples ejecuciones"""
+        entrada = np.array([1, 1])  # OR(1,1) = 1
+        resultados = []
+        for _ in range(5):
+            salida = backpropagation_network(entrada, 10, 5)
+            resultados.append(round(salida, 5))
+        self.assertGreater(max(resultados) - min(resultados), 0.01,
+                        "Backpropagation no muestra señales de aprendizaje.")
 
 if __name__ == '__main__':
     suite = unittest.defaultTestLoader.loadTestsFromTestCase(TestEvaluation)
