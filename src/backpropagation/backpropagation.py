@@ -127,3 +127,4 @@ def backpropagation_network(inputs: np.ndarray, perceptrons: int, layers: int) -
 
     # --- 6. Retornar salida final ---
     return float(output_neuron.a)
+#ok
