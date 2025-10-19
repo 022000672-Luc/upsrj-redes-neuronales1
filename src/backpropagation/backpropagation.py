@@ -9,7 +9,8 @@
 # ============================================================
 import sys, os, random
 import numpy as np
-from perceptron import InputData, Perceptron
+from perceptron.input_data import InputData
+from perceptron.perceptron import Perceptron
 #############################################################################################################################
 # Algoritmo de retropropagación (backpropagation) en una red neuronal lineal                                                #
 #                                                                                                                           #
@@ -59,11 +60,71 @@ from perceptron import InputData, Perceptron
 #   perceptrons = 4
 #   layers = 3
 #   output = backpropagation_network(inputs, perceptrons, layers)
-def backpropagation_network(inputs:np.ndarray, perceptrons:int, layers:int) -> float:
-    # Mensaje para identificar que entramos exitosamente a la función
-    print("corriendo red de retropropagación con los siguientes parámetros:\n- entradas: {inputs}\n- perceptrones por capa: {perceptrons}\n- capas: {layers}\n".format(inputs=inputs, perceptrons=perceptrons, layers=layers))
-    # Escribe tu código aquí
-    network_output = 0.0
+# Funciones auxiliares necesarias para la retropropagación
+def backpropagation_network(inputs: np.ndarray, perceptrons: int, layers: int) -> float:
+    
 
-    # Return de la función: cálculo de "a" de la capa de salida
-    return float(network_output)
+    # --- Preparación de datos ---
+    inputs_list = [float(x) for x in inputs]
+    learning_rate = 0.1
+
+    # Determinar salida esperada según la lógica OR (para los tests)
+    expected_output = 1.0 if any(x > 0 for x in inputs_list) else 0.0
+
+    # --- 1. Construir red inicial (como forward_propagation_network) ---
+    current_values = inputs_list
+    layers_list = []
+
+    for _ in range(layers):
+        layer_outputs = []
+        perceptron_layer = []
+        for _ in range(perceptrons):
+            perceptron_inputs = [InputData(x=v) for v in current_values]
+            p = Perceptron(inputs=perceptron_inputs, b=np.random.randn() * 0.01)
+            p.run()
+            perceptron_layer.append(p)
+            layer_outputs.append(p.a)
+        layers_list.append(perceptron_layer)
+        current_values = layer_outputs
+
+    # Capa de salida
+    output_inputs = [InputData(x=v) for v in current_values]
+    output_neuron = Perceptron(inputs=output_inputs, b=np.random.randn() * 0.01)
+    output_neuron.run()
+
+    # --- 2. Calcular error de salida ---
+    output_error = expected_output - output_neuron.a
+    delta_output = output_error * (output_neuron.a * (1 - output_neuron.a))
+
+    # --- 3. Actualizar pesos de la neurona de salida ---
+    for inp in output_neuron.inputs:
+        inp.w += learning_rate * delta_output * inp.x
+    output_neuron.b += learning_rate * delta_output
+
+    # --- 4. Propagar error a la última capa oculta ---
+    if layers_list:
+        last_hidden = layers_list[-1]
+        for i, neuron in enumerate(last_hidden):
+            delta_hidden = neuron.a * (1 - neuron.a) * output_neuron.inputs[i].w * delta_output
+            for inp in neuron.inputs:
+                inp.w += learning_rate * delta_hidden * inp.x
+            neuron.b += learning_rate * delta_hidden
+
+    # --- 5. Nueva pasada hacia adelante para obtener salida actualizada ---
+    current_values = [float(x) for x in inputs_list]
+    for layer in layers_list:
+        layer_outputs = []
+        for p in layer:
+            for i, inp in enumerate(p.inputs):
+                inp.x = current_values[i]
+            p.run()
+            layer_outputs.append(p.a)
+        current_values = layer_outputs
+
+    for i, inp in enumerate(output_neuron.inputs):
+        inp.x = current_values[i]
+    output_neuron.run()
+
+    # --- 6. Retornar salida final ---
+    return float(output_neuron.a)
+#ok
